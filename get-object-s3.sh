@@ -2,7 +2,7 @@
 
 if [[ $# -lt 2 ]]; then
   echo "Error: Missing required argument"
-  echo "Usage: script.sh bucket_name object_path"
+  echo "Usage: get-object-s3.sh bucket_name object_path"
   exit 1
 fi
 
