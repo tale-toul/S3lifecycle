@@ -64,7 +64,7 @@ printf %s "$(cat string_to_sign.tmp)" > string_to_sign.tmp
 SIGNATURE=$(openssl dgst -sha256 -mac HMAC -macopt hexkey:$HEX_KEY string_to_sign.tmp | awk -F ' ' '{print $2}')
 
 # Remove temporary files
-#rm canonical_request.tmp string_to_sign.tmp
+rm canonical_request.tmp string_to_sign.tmp
 
 # HTTP Request using signature
 curl -k https://a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com${CANONICAL_URI}?lifecycle= \
