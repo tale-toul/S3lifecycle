@@ -1,24 +1,14 @@
 #!/bin/bash
 
-if [[ $# -lt 2 ]]; then
-  echo "Error: Missing required argument"
-  echo "Usage: get-object-s3.sh bucket_name object_path"
-  exit 1
-fi
+ACCESS_KEY_ID="Im6wMbASZ9FPQcRztTka"
+SECRET_ACCESS_KEY="YxKCLbQuSQrX/wa+rDJSNNDRHYGT0ZnTaVtOWNHQ"
 
-# Retreive IAM credentials from EC2 instance metadata
-INSTANCE_PROFILE="$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)"
-METADATA=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$INSTANCE_PROFILE)
-ACCESS_KEY_ID=$(echo "$METADATA" | grep AccessKeyId | sed -e 's/  "AccessKeyId" : "//' -e 's/",$//')
-SECRET_ACCESS_KEY=$(echo "$METADATA" | grep SecretAccessKey | sed -e 's/  "SecretAccessKey" : "//' -e 's/",$//')
-SESSION_TOKEN=$(echo "$METADATA" | grep Token | sed -e 's/  "Token" : "//' -e 's/",$//')
-
-# Retreive AWS Region name where the instance is launched
-REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed s/.$//)
+REGION=""
 AWS_SERVICE="s3"
 
 HTTP_METHOD="GET"
-CANONICAL_URI="/$2"
+CANONICAL_URI="/loki-bucket-odf-4ff4f440-5128-46a5-b6ba-58d67c4b6cc4/"
+CANONICAL_QUERY_STRING="lifecycle="
 
 #Retreive current date in appropriate format
 DATE_AND_TIME=$(date -u +"%Y%m%dT%H%M%SZ")
@@ -26,18 +16,19 @@ DATE=$(date -u +"%Y%m%d")
 EMPTY_STRING_HASH=$(printf "" | openssl dgst -sha256 | cut -d ' ' -f 2)
 
 #Store Canonical request
+#The blank line is important according to the schema https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
 /bin/cat >./canonical_request.tmp <<EOF
 $HTTP_METHOD
 $CANONICAL_URI
-
-host:$1.s3.amazonaws.com
+$CANONICAL_QUERY_STRING
+host:a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com
 x-amz-content-sha256:$EMPTY_STRING_HASH
 x-amz-date:$DATE_AND_TIME
-x-amz-security-token:$SESSION_TOKEN
 
-host;x-amz-content-sha256;x-amz-date;x-amz-security-token
+host;x-amz-content-sha256;x-amz-date
 $EMPTY_STRING_HASH
 EOF
+
 
 # Remove trailing newline
 printf %s "$(cat canonical_request.tmp)" > canonical_request.tmp 
@@ -66,25 +57,19 @@ $DATE/$REGION/$AWS_SERVICE/aws4_request
 $CANONICAL_REQUEST_HASH
 EOF
 
+# Remove trailing newline
 printf %s "$(cat string_to_sign.tmp)" > string_to_sign.tmp
 
 # Generate signature
 SIGNATURE=$(openssl dgst -sha256 -mac HMAC -macopt hexkey:$HEX_KEY string_to_sign.tmp | awk -F ' ' '{print $2}')
 
 # Remove temporary files
-rm canonical_request.tmp string_to_sign.tmp
-
-# Remove file prefix
-OUTPUT=$(echo $2 |  awk -F '/' '{print $NF}')
+#rm canonical_request.tmp string_to_sign.tmp
 
 # HTTP Request using signature
-curl -s https://$1.s3.amazonaws.com/$2 \
+curl -k https://a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com${CANONICAL_URI}?lifecycle= \
   -X $HTTP_METHOD \
-  -H "Authorization: AWS4-HMAC-SHA256 \
-      Credential=$ACCESS_KEY_ID/$DATE/$REGION/$AWS_SERVICE/aws4_request, \
-      SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-security-token, \
-      Signature=$SIGNATURE" \
+  -H "Authorization: AWS4-HMAC-SHA256 Credential=$ACCESS_KEY_ID/$DATE/$REGION/$AWS_SERVICE/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=$SIGNATURE" \
   -H "x-amz-content-sha256: $EMPTY_STRING_HASH" \
-  -H "x-amz-date: $DATE_AND_TIME" \
-  -H "x-amz-security-token: $SESSION_TOKEN" \
-  -o "$OUTPUT"
+  -H "x-amz-date: $DATE_AND_TIME" 
+#  -o "$OUTPUT"
