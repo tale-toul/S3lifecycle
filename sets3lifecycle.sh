@@ -4,6 +4,7 @@
 ACCESS_KEY_ID="Im6wMbASZ9FPQcRztTka"
 SECRET_ACCESS_KEY="YxKCLbQuSQrX/wa+rDJSNNDRHYGT0ZnTaVtOWNHQ"
 
+HOSTNAME="a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com"
 REGION=""
 AWS_SERVICE="s3"
 
@@ -20,7 +21,7 @@ LIFECYCLE_CONF=$(cat <<EOF
         </Filter>
         <Status>Enabled</Status>
         <Expiration>
-             <Days>2</Days>
+             <Days>1</Days>
         </Expiration>
     </Rule>
 </LifecycleConfiguration>
@@ -40,7 +41,7 @@ $HTTP_METHOD
 $CANONICAL_URI
 $CANONICAL_QUERY_STRING
 content-md5:$CONTENT_MD5
-host:a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com
+host:$HOSTNAME
 x-amz-content-sha256:$CONTENT_SHA256
 x-amz-date:$DATE_AND_TIME
 
@@ -78,7 +79,7 @@ EOF
 SIGNATURE=$(echo -n "$SIGN_STRING" | openssl dgst -sha256 -mac HMAC -macopt hexkey:$HEX_KEY | awk -F ' ' '{print $2}')
 
 # HTTP Request using signature
-curl -k https://a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com${CANONICAL_URI}?lifecycle= \
+curl -k https://${HOSTNAME}${CANONICAL_URI}?lifecycle= \
   -X $HTTP_METHOD \
   -H "content-md5: $CONTENT_MD5" \
   -H "Authorization: AWS4-HMAC-SHA256 Credential=$ACCESS_KEY_ID/$DATE/$REGION/$AWS_SERVICE/aws4_request, SignedHeaders=content-md5;host;x-amz-content-sha256;x-amz-date, Signature=$SIGNATURE" \
