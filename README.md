@@ -67,10 +67,10 @@ Set the lifecycle configuration with the following command:
 ````
 
 ## References
-[Openshift Data Foundation documentation](https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14)
-[s3cmd cli tool](https://github.com/s3tools)
-[Managing your storage lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
-[Setting a lifecycle configuration on a bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/how-to-set-lifecycle-configuration-intro.html)
-[Signature Calculations for the Authorization Header: Transferring Payload in a Single Chunk (AWS Signature Version 4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html)
-[Get S3 object securely using curl and openssl with SIGV4](https://blog.revolve.team/2023/01/19/s3-object-securely-curl-openssl-sigv4/)
-[Git Hub repor for "Get S3 object" blog post](https://github.com/ReyanL/get-object-s3)
+* [Openshift Data Foundation documentation](https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14)
+* [s3cmd cli tool](https://github.com/s3tools)
+* [Managing your storage lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
+* [Setting a lifecycle configuration on a bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/how-to-set-lifecycle-configuration-intro.html)
+* [Signature Calculations for the Authorization Header: Transferring Payload in a Single Chunk (AWS Signature Version 4)](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html)
+* [Get S3 object securely using curl and openssl with SIGV4](https://blog.revolve.team/2023/01/19/s3-object-securely-curl-openssl-sigv4/)
+* [Git Hub repor for "Get S3 object" blog post](https://github.com/ReyanL/get-object-s3)
