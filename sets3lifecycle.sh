@@ -17,7 +17,7 @@ LIFECYCLE_CONF=$(cat <<EOF
     <Rule>
         <ID>logging-data-expire</ID>
         <Filter>
-	  <Prefix>/</Prefix>
+	  <Prefix></Prefix>
         </Filter>
         <Status>Enabled</Status>
         <Expiration>

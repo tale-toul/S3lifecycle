@@ -36,7 +36,7 @@ Set the name of the bucket to get or set the lifecycle configuration:
 ```
 CANONICAL_URI="/loki-bucket-odf-4ff4f440-5128-46a5-b6ba-58d67c4b6cc4/"
 ```
-In the case of setting the configuration, define the configuration in xml format:
+In the case of setting the configuration, define the configuration in xml format. In the next example the Prefix is empty to affect the whole bucket:
 
 ```
 LIFECYCLE_CONF=$(cat <<EOF
@@ -44,7 +44,7 @@ LIFECYCLE_CONF=$(cat <<EOF
     <Rule>
         <ID>logging-data-expire</ID>
         <Filter>
-	  <Prefix>/</Prefix>
+	  <Prefix></Prefix>
         </Filter>
         <Status>Enabled</Status>
         <Expiration>
