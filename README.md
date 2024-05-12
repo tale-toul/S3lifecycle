@@ -66,6 +66,38 @@ Set the lifecycle configuration with the following command:
 ./sets3lifecycle.sh
 ````
 
+## Verify lifecycle configuration
+
+If a new lifecycle configuration has been set in the S3 bucket, here is how to verify that it has been successfully applied and it is working in a Nooba/ODF provided bucket.
+
+The S3 bucket provider does not delete any files until their expiration days have passed, for example if the expiration days is 5, no files will be deleted until they are older than 5 days.  So it may take a while before policy effects can be seen.
+
+Get the list of all the files in the bucket.  In the example, the list is sorted by date and saved to a file.
+```
+s3cmd ls --recursive s3://loki-bucket-odf-4ff4f440-5128-46a5-b6ba-58d67c4b6cc4|sort >filelist.txt
+```
+
+After the expiration days have passed, the oldest files should disappear from the list.
+
+The size of the bucket can also be checked with
+```
+s3cmd du -H  s3://loki-bucket-odf-4ff4f440-5128-46a5-b6ba-58d67c4b6cc4
+```
+
+Check the logs of the nooba core pod. If any files were deleted the following messages should appear:
+```
+oc logs noobaa-core-0 -n openshift-storage|less -R
+
+core.server.bg_services.agent_blocks_reclaimer:: AGENT_BLOCKS_RECLAIMER: BEGIN
+core.server.bg_services.objects_reclaimer:: object_reclaimer: starting batch work on objects:  index/index_19855/infrastructure/1715527765-compactor-1715464235736-1715526930765-c02c502f.tsdb.gz, index/index_19855/application/1715527765-compactor-1715465467963-1715526915661-90de4342.tsdb.gz,...
+core.server.object_services.md_store:: find_object_parts_unreferenced_chunk_ids: chunk_ids 1 referenced_chunks_ids 0 unreferenced_chunks_ids 1
+...
+core.server.object_services.map_deleter:: delete_blocks_from_node: node 663a5fa335aa4f00263fff46 n2n://663a5fa335aa4f00263fff47 block_ids 1
+core.server.object_services.map_deleter:: delete_blocks_from_node: node 663a5fa335aa4f00263fff46 n2n://663a5fa335aa4f00263fff47 succeeded_block_ids 1
+core.server.object_services.md_store:: update_object_by_id: 6640e0e90337c9000de85999
+core.server.bg_services.objects_reclaimer:: no objects in "unreclaimed" state. nothing to do
+```
+
 ## References
 * [Openshift Data Foundation documentation](https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14)
 * [s3cmd cli tool](https://github.com/s3tools)
