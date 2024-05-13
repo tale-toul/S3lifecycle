@@ -12,7 +12,7 @@ The scripts have been tested in an [Openshift Data Foundation](https://access.re
 - The necessary permissions to access an object in an S3 bucket, including the name of the bucket and the path to the object.
 
 
-## Usage
+## Usage External
 
 Here is how to use the scripts to get and set the lifecycle configuration:
 
@@ -69,6 +69,39 @@ Get the lifecycle configuration with the following command:
 Set the lifecycle configuration with the following command:
 ````
 ./sets3lifecycle.sh
+````
+
+## Usage Internal 
+
+If the script cannot be executed from outside the Openshift cluster, for example because the **s3** endpoint does not have a corresponding external IP or name.  It can be executed from a pod running inside penshift.
+
+The ACCESS_KEY_ID and SECRET_ACCESS_KEY can be obtained from the secret associated with the object bucket claim:
+````
+oc extract secret/loki-bucket-odf -n openshift-logging --to -
+````
+
+Fill in the data as explained earlier, but in this case the value of HOSTNAME is the name of the s3 service:
+````
+HOSTNAME="s3.openshift-storage.svc"
+````
+Leave the REGION empty as above.
+
+The CANONICAL URI contains the name of the bucket between forward slash characters.  This can be obtained from the config map associated with the bucket
+````
+oc get cm -n openshift-logging loki-bucket-odf -o yaml
+````
+
+Run a pod in interactive mode:
+````
+oc run -i -t ocli --image=registry.redhat.io/openshift4/ose-cli --restart=Never
+````
+From another shell session copy the script to the running pod
+````
+oc cp /home/redhat/S3lifecycle/gets3lifecycle.sh testarudo/ocli:/gets3lifecycle.sh
+````
+From the shell session inside pod, run the script:
+````
+[root@ocli /]# ./gets3lifecycle.sh
 ````
 
 ## Verify lifecycle configuration
