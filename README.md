@@ -23,14 +23,14 @@ ACCESS_KEY_ID="Im6w...ztTka"
 SECRET_ACCESS_KEY="YxKCLb....T0ZnTaVtOWNHQ"
 ```
 
-Define the hostname for the S3 bucket.  In Openshift this is the external IP name associated the **s3** service:
+Define the hostname for the S3 bucket.  In Openshift this is the external name associated the **s3** route:
 ```
-oc get svc s3 -n openshift-storage
+oc get route s3 -n openshift-storage
 
-NAME   TYPE           CLUSTER-IP      EXTERNAL-IP                                                              PORT(S)                                                    AGE
-s3     LoadBalancer   172.30.85.176   a49d691c70f984819a4df1c7a677b882-633984083.eu-west-1.elb.amazonaws.com   80:31152/TCP,443:31974/TCP,8444:30593/TCP,7004:31841/TCP   4h38m
+NAME   HOST/PORT                                              PATH   SERVICES   PORT   	...
+s3 	   s3-openshift-storage.apps.jz-ocp-hub1-prod.ntw.o2.cz          s3         s3-https ...
 
-HOSTNAME="a38676c2b4b6b47eeb176aeb09bb8566-2027527576.eu-west-1.elb.amazonaws.com"
+HOSTNAME="s3-openshift-storage.apps.jz-ocp-hub1-prod.ntw.o2.cz"
 ```
 
 Define the region in the following variable, in case of Nooba, the region is empty:
